@@ -81,7 +81,7 @@ func (c *Client) URL(relPath string) string {
 	if baseURL == "" {
 		baseURL = DefaultBase
 	}
-	return strings.TrimRight(c.baseURL, "/") + "/" + strings.TrimLeft(relPath, "/")
+	return strings.TrimRight(baseURL, "/") + "/" + strings.TrimLeft(relPath, "/")
 }
 
 // Segment represents a segment of transcribed text in the TranscribeResponse.
