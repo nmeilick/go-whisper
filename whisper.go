@@ -77,6 +77,10 @@ func (c *Client) URL(relPath string) string {
 	if strings.Contains(relPath, "://") {
 		return relPath
 	}
+	baseURL := c.baseURL
+	if baseURL == "" {
+		baseURL = DefaultBase
+	}
 	return strings.TrimRight(c.baseURL, "/") + "/" + strings.TrimLeft(relPath, "/")
 }
 
@@ -232,4 +236,3 @@ func (c *Client) Transcribe(h io.Reader, opts ...TranscribeOption) (*TranscribeR
 	}
 	return &tr, nil
 }
-
