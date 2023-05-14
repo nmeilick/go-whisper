@@ -12,6 +12,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -116,7 +117,8 @@ func (c *Client) TranscribeFile(file string, opts ...TranscribeOption) (*Transcr
 	}
 	defer h.Close()
 
-	return c.Transcribe(h)
+	opts = append([]TranscribeOption{WithFile(filepath.Base(file))}, opts...)
+	return c.Transcribe(h, opts...)
 }
 
 // TranscribeConfig is a structure that holds the configuration for the Transcribe method.
@@ -165,6 +167,10 @@ func (c *Client) Transcribe(h io.Reader, opts ...TranscribeOption) (*TranscribeR
 		tc.Model = DefaultModel
 	}
 
+	if tc.File == "" {
+		return nil, errors.New("filename is not set")
+	}
+
 	b := &bytes.Buffer{}
 	mp := multipart.NewWriter(b)
 
@@ -179,12 +185,7 @@ func (c *Client) Transcribe(h io.Reader, opts ...TranscribeOption) (*TranscribeR
 	}
 	f.Write([]byte("verbose_json"))
 
-	file := tc.File
-	if file == "" {
-		file = "noname.m4a"
-	}
-
-	fp, err := mp.CreateFormFile("file", file)
+	fp, err := mp.CreateFormFile("file", tc.File)
 	if err != nil {
 		return nil, err
 	}
